@@ -1,19 +1,58 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Spline from '@splinetool/react-spline';
 import { ArrowRight, Rocket, Shield } from 'lucide-react';
 
+function isWebGLAvailable() {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    return !!gl;
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function Hero() {
+  const [webgl, setWebgl] = useState(true);
+
+  useEffect(() => {
+    // Detect WebGL support at runtime and gracefully fallback if unavailable
+    setWebgl(isWebGLAvailable());
+  }, []);
+
+  const headline = useMemo(
+    () => 'The next evolution of crypto finance',
+    []
+  );
+
+  const subcopy = useMemo(
+    () => 'Trade, earn, and build with lightning-fast settlement and a holographic-grade UI. Built for speed, safety, and scale.',
+    []
+  );
+
   return (
     <section className="relative min-h-[90vh] w-full overflow-hidden bg-black text-white">
-      {/* 3D Spline Background */}
+      {/* 3D Spline Background or Fallback */}
       <div className="absolute inset-0">
-        <Spline
-          scene="https://prod.spline.design/44zrIZf-iQZhbQNQ/scene.splinecode"
-          style={{ width: '100%', height: '100%' }}
-        />
+        {webgl ? (
+          <Spline
+            // Auto-enhanced Spline animation
+            scene="https://prod.spline.design/EF7JOSsHLk16Tlw9/scene.splinecode"
+            style={{ width: '100%', height: '100%' }}
+          />
+        ) : (
+          <div className="h-full w-full bg-[radial-gradient(120%_120%_at_0%_0%,#0b0b0b_10%,#0a0a0a_35%,#0f172a_70%,#020617_100%)]">
+            {/* Animated aurora fallback */}
+            <div className="pointer-events-none absolute inset-0 opacity-60">
+              <div className="absolute -left-20 top-1/3 h-64 w-64 animate-[pulse_6s_ease-in-out_infinite] rounded-full bg-emerald-500/20 blur-3xl" />
+              <div className="absolute right-0 top-10 h-72 w-72 animate-[pulse_8s_ease-in-out_infinite] rounded-full bg-indigo-500/20 blur-3xl" />
+              <div className="absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 animate-[pulse_7s_ease-in-out_infinite] rounded-full bg-fuchsia-500/20 blur-3xl" />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Soft gradient overlays to boost contrast */}
+      {/* Soft gradient overlays to boost contrast (never block interaction) */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black to-transparent" />
 
@@ -25,10 +64,10 @@ export default function Hero() {
         </div>
 
         <h1 className="mt-6 max-w-4xl bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-4xl font-extrabold leading-tight text-transparent sm:text-6xl">
-          The next evolution of crypto finance
+          {headline}
         </h1>
         <p className="mt-5 max-w-2xl text-base text-white/80 sm:text-lg">
-          Trade, earn, and build with lightning-fast settlement and a holographic-grade UI. Built for speed, safety, and scale.
+          {subcopy}
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row">
@@ -47,6 +86,12 @@ export default function Hero() {
             Learn More
           </a>
         </div>
+
+        {!webgl && (
+          <p className="mt-6 max-w-xl text-xs text-white/50">
+            Your browser or environment has WebGL disabled. Showing an animated fallback instead of the 3D scene.
+          </p>
+        )}
       </div>
     </section>
   );
